@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+.title {
+	margin: 0 auto;
+	max-width: 420px;
+	font-weight: bold;
+}
+
+.item1 { 
+	grid-area: header;
+	min-height: 300px;
+	max-width: 420px;
+	margin: 0 auto;
+}
+
+.mjpeg {
+	max-width: 100%;
+}
+
+.item2 { 
+	grid-area: main;
+	display: grid;
+	grid-template-columns: 25% 25% 25% 25%;
+	padding: 1px;	
+}
+
+.item2-sub {
+  font-size: 30px;
+  text-align: center;
+  height: 80px;
+}
+
+
+.item3 { 
+	grid-area: right;	
+}
+
+.item4 { 
+	grid-area: footer;
+	display: grid;
+	grid-template-columns: 30% auto;
+	padding: 1px;	
+}
+
+.item4-sub1 {
+  font-size: 16px;
+  text-align: left;
+}
+
+.item4-sub2 {
+  font-size: 16px;
+  text-align: left;
+  background-color: #FFFFFF;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-areas:
+  'header header header header header header header header header'
+  'main main main main main main main right right'
+  'footer footer footer footer footer footer footer footer footer';
+  grid-gap: 2px;
+  background-color: #ffffff;
+  max-width: 420px;
+  margin: 0 auto;  
+}
+
+.grid-container > div {
+  background-color: #f2f2f2;
+  text-align: center;
+  /*padding: 20px 0;*/
+  font-size: 30px;
+}
+
+
+.btn-block {
+  display: inline-block;
+  width: 95%;
+  height: 80%;
+  border: none;
+  background-color: #4CAF50;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 12px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin-bottom: 2px;
+}
+
+.btn-resv {
+  display: inline-block;
+  width: 95%;
+  height: 80%;
+  border: none;
+  background-color: #F2F2F2;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 12px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin-bottom: 2px;
+}
+
+
+#flash {
+	background-color: #fcfa5d;
+}
+
+
+	  
+</style>
+<!--
+<link rel="stylesheet" href="/jquery-ui.css">
+<script type="text/javascript" src="/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery-ui.js"></script>
+<script type="text/javascript" src="/jquery.ui.touch-punch.min.js"></script>
+-->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha512-aOG0c6nPNzGk+5zjwyJaoRUgCdOrfSDhmMID2u4+OIslr0GjpLKo7Xm0Ao3xmpM4T8AmIouRkqwj1nrdVsLKEQ==" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js" integrity="sha512-0bEtK0USNd96MnO4XhH8jhv3nyRF0eK87pJke6pkYf3cM0uDIhNJy9ltuzqgypoIFXw3JSuiy04tVk4AjpZdZw==" crossorigin="anonymous"></script>
+
+<script>
+	$(document).ready( function(){
+
+        var pageURL = $(location).attr("origin");
+        var servhost = pageURL.replace("http://","ws://")+"/ctrl"
+	
+		try {
+			var wsocket = new WebSocket(servhost)
+			
+			wsocket.onmessage = function(evt) { onMessage(evt) };
+		}
+		catch(exception) {
+			$("#statval").text("error open web socket");
+		}
+		
+		function onMessage(evt)
+		{
+			//$("#stat").text("message:");
+			//$("#statval").text(evt.data);
+			if (evt.data == "flash:on") {
+				$("#flash").css("background-color", "#FF5032");
+			}
+			else if (evt.data == "flash:off") {
+				$("#flash").css("background-color", "#FCFA5D");
+			}
+			
+		}		
+		
+		$(".slider1").slider({
+			min: -90,
+			max: 90,
+			orientation: "vertical",
+			value: 0,
+			slide: function(event, ui) {
+				$("#stat").text("camera:");
+				$("#statval").text(ui.value.toString()+" degree");
+				wsocket.send("cam:"+ui.value.toString());
+			}
+		});
+		$(".slider1").css({
+			"margin": "30px auto", 
+			"height": "70%"
+		});
+		$(".slider1").draggable();
+		
+		$(".slider2").slider({
+			min: 0,
+			max: 100,
+			orientation: "vertical",
+			value: 100,
+			slide: function(event, ui) {
+				$("#stat").text("speed:");
+				$("#statval").text(ui.value+"%");
+				wsocket.send("speed:"+ui.value.toString());
+			}
+		});
+		$(".slider2").css({
+			"margin": "0 auto", 
+			"height": "70%"
+		});
+		$(".slider2").draggable();
+		
+        $(".btn-block").on('touchstart', function(e){
+            if (event.target.id != "flash") {
+                $("#statval").text(event.target.id);
+				wsocket.send("ctrl:"+event.target.id);
+				
+			}
+        });
+
+        $(".btn-block").on('touchend', function(e){
+			if (event.target.id != "flash") {
+                $("#statval").text("stop");
+				wsocket.send("ctrl:stop");
+				
+			}
+        });		
+
+		$("#flash").click(function(){
+			wsocket.send("ctrl:flash");
+		});
+	
+	});
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<div class="title">Rover Controler<div>
+
+<div class="grid-container">
+  <div class="item1"><img class="mjpeg" src="/stream"></img></div>
+  <div class="item2">
+
+	  <div class="item2-sub"><button class="btn-resv" id="resv1"></button></div>
+	  <div class="item2-sub"><button class="btn-resv" id="resv2"></button></div>
+	  <div class="item2-sub"><button class="btn-resv" id="resv3"></button></div>
+	  <div class="item2-sub"><button class="btn-resv" id="resv4"></button></div>
+	  <div class="item2-sub"><button class="btn-block" id="fwdleft">fwdleft</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="fwd">fwd</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="fwdright">fwdright</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="flash">flash</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="left">left</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="stop">stop</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="right">right</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="CW">CW</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="bwdleft">bwdleft</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="bwd">bwd</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="bwdright">bwdright</button></div>
+	  <div class="item2-sub"><button class="btn-block" id="CCW">CCW</button></div>
+
+  </div>  
+  <div class="item3">
+	<div style="height: 50%;">
+		<div class="slider1"></div>
+	</div>
+	<div style="height: 50%;">
+		<div class="slider2"></div>
+	</div>	
+  </div>
+  <div class="item4">
+	<div class="item4-sub1" id="stat">status:</div>
+	<div class="item4-sub2" id="statval">ok</div>
+  </div>
+</div>
+
+</body>
+</html>
